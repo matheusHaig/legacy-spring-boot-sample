@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test class for Phase 1-4 Report functionality.
  * レポート機能のテストクラス
  */
+@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest(ReportController.class)
 public class ReportControllerPhase14Test {
 
