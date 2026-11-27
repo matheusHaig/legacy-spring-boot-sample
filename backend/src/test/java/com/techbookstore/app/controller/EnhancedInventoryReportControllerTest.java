@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.*;
 /**
  * Enhanced Inventory Report Controller Integration Tests - Phase 1
  */
+@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest(ReportController.class)
 public class EnhancedInventoryReportControllerTest {
 

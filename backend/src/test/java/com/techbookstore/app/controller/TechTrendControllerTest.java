@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test class for TechTrendController
  * 技術トレンドコントローラのテストクラス
  */
+@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest(TechTrendController.class)
 public class TechTrendControllerTest {
 
