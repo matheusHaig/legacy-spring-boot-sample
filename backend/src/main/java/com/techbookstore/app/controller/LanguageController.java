@@ -9,6 +9,8 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Locale;
+import java.net.URI;
+import java.util.Arrays;
 
 /**
  * Controller for handling language switching.
@@ -28,6 +30,59 @@ public class LanguageController {
         
         // Redirect to referer or home
         String referer = request.getHeader("Referer");
-        return "redirect:" + (referer != null ? referer : "/");
+        return "redirect:" + resolveSafeRedirect(referer, request);
+    }
+
+    private String resolveSafeRedirect(
+            String referer, HttpServletRequest request) {
+
+        if (referer == null || referer.isBlank() || referer.startsWith("//")) {
+            return "/";
+        }
+
+        try {
+            URI uri = URI.create(referer);
+
+            if (uri.isAbsolute()) {
+                String scheme = uri.getScheme();
+
+                if (!"http".equalsIgnoreCase(scheme)
+                        && !"https".equalsIgnoreCase(scheme)) {
+                    return "/";
+                }
+
+                int port = uri.getPort() == -1
+                        ? ("https".equalsIgnoreCase(scheme) ? 443 : 80)
+                        : uri.getPort();
+
+                if (uri.getHost() == null
+                        || uri.getUserInfo() != null
+                        || !uri.getHost().equalsIgnoreCase(request.getServerName())
+                        || !scheme.equalsIgnoreCase(request.getScheme())
+                        || port != request.getServerPort()) {
+                    return "/";
+                }
+            } else if (uri.getRawAuthority() != null) {
+                return "/";
+            }
+
+            String path = uri.getRawPath();
+
+            if (path == null
+                    || !path.matches("/[A-Za-z0-9._~/-]*")
+                    || path.contains("//")
+                    || Arrays.stream(path.split("/"))
+                    .anyMatch(segment ->
+                            ".".equals(segment) || "..".equals(segment))) {
+                return "/";
+            }
+
+            return uri.getRawQuery() == null
+                    ? path
+                    : path + "?" + uri.getRawQuery();
+
+        } catch (IllegalArgumentException exception) {
+            return "/";
+        }
     }
 }

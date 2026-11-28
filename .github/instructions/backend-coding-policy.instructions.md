@@ -37,7 +37,6 @@ com.techbookstore.app/
 ```java
 @RestController
 @RequestMapping("/api/v1/[resource]")
-@CrossOrigin(origins = "http://localhost:3000")  // REQUIRED for React frontend
 public class [Resource]Controller {
 
     @Autowired  // LEGACY PATTERN - Required for consistency

@@ -22,6 +22,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 
 @SpringBootTest(properties = "management.health.redis.enabled=false")
 @AutoConfigureMockMvc
@@ -175,5 +176,46 @@ class SecurityConfigTest {
 
         mockMvc.perform(get(PROTECTED_ENDPOINT))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldAllowConfiguredCorsOrigin() throws Exception {
+        mockMvc.perform(get(PROTECTED_ENDPOINT)
+                        .with(httpBasic("user", userPassword))
+                        .header("Origin", "http://localhost:3000"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(
+                        "Access-Control-Allow-Origin",
+                        "http://localhost:3000"));
+    }
+
+    @Test
+    void shouldRejectUnauthorizedCorsOrigin() throws Exception {
+        mockMvc.perform(get(PROTECTED_ENDPOINT)
+                        .with(httpBasic("user", userPassword))
+                        .header("Origin", "https://malicious.example"))
+                .andExpect(status().isForbidden())
+                .andExpect(header().doesNotExist(
+                        "Access-Control-Allow-Origin"));
+    }
+
+    @Test
+    void shouldAllowPreflightWithoutAuthentication() throws Exception {
+        mockMvc.perform(options(PROTECTED_ENDPOINT)
+                        .header("Origin", "http://localhost:3000")
+                        .header("Access-Control-Request-Method", "GET")
+                        .header("Access-Control-Request-Headers", "Authorization"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(
+                        "Access-Control-Allow-Origin",
+                        "http://localhost:3000"));
+    }
+
+    @Test
+    void shouldRejectUnauthorizedPreflight() throws Exception {
+        mockMvc.perform(options(PROTECTED_ENDPOINT)
+                        .header("Origin", "https://malicious.example")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(status().isForbidden());
     }
 }
