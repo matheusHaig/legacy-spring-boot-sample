@@ -118,6 +118,10 @@ jobs:
         containerAppEnvironment: techbookstore-env-staging
         targetPort: 8080
         imageToDeploy: ${{ secrets.ACR_LOGIN_SERVER }}/techbookstore:${{ github.sha }}
+        environmentVariables: >-
+          SPRING_PROFILES_ACTIVE=staging
+          API_USER_PASSWORD=secretref:api-user-password
+          API_ADMIN_PASSWORD=secretref:api-admin-password
 
   deploy-production:
     needs: build
@@ -142,3 +146,7 @@ jobs:
         containerAppEnvironment: techbookstore-env
         targetPort: 8080
         imageToDeploy: ${{ secrets.ACR_LOGIN_SERVER }}/techbookstore:${{ github.sha }}
+        environmentVariables: >-
+          SPRING_PROFILES_ACTIVE=prod
+          API_USER_PASSWORD=secretref:api-user-password
+          API_ADMIN_PASSWORD=secretref:api-admin-password

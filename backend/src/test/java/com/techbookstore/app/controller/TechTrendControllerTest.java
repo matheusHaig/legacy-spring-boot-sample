@@ -10,7 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
+import com.techbookstore.app.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import java.util.*;
 
 import static org.mockito.Mockito.when;
@@ -20,8 +23,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test class for TechTrendController
  * 技術トレンドコントローラのテストクラス
  */
-@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
+
 @WebMvcTest(TechTrendController.class)
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
+@WithMockUser(roles = "USER")
 public class TechTrendControllerTest {
 
     @Autowired
