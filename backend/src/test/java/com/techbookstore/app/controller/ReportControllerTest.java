@@ -12,7 +12,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
+import com.techbookstore.app.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -23,9 +26,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest({ReportController.class, com.techbookstore.app.exception.GlobalExceptionHandler.class})
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
+@WithMockUser(roles = "USER")
 class ReportControllerTest {
 
     @Autowired
@@ -140,6 +146,7 @@ class ReportControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/v1/reports/custom")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -154,6 +161,7 @@ class ReportControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/v1/reports/custom")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());

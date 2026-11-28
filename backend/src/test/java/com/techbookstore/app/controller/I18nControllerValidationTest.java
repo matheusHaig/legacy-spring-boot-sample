@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
+import com.techbookstore.app.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +21,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
 
-@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest(I18nController.class)
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
+@WithMockUser(roles = "USER")
 class I18nControllerValidationTest {
 
     @Autowired

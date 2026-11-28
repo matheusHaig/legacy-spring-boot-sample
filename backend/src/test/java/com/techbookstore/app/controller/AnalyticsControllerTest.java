@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-
+import com.techbookstore.app.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -18,8 +21,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest({ReportController.class, com.techbookstore.app.exception.GlobalExceptionHandler.class})
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
+@WithMockUser(roles = "USER")
 public class AnalyticsControllerTest {
 
     @Autowired

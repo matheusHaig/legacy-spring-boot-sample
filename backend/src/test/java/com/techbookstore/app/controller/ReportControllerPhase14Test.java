@@ -10,6 +10,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import com.techbookstore.app.config.SecurityConfig;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -26,8 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test class for Phase 1-4 Report functionality.
  * レポート機能のテストクラス
  */
-@org.springframework.context.annotation.Import(com.techbookstore.app.config.SecurityConfig.class)
 @WebMvcTest(ReportController.class)
+@Import(SecurityConfig.class)
+@ActiveProfiles("test")
+@WithMockUser(roles = "USER")
 public class ReportControllerPhase14Test {
 
     @Autowired
@@ -142,8 +149,9 @@ public class ReportControllerPhase14Test {
             .thenReturn(mockReport);
 
         mockMvc.perform(post("/api/v1/reports/custom-reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
@@ -186,18 +194,21 @@ public class ReportControllerPhase14Test {
             .thenReturn(mockDrillDown);
 
         mockMvc.perform(post("/api/v1/reports/drill-down")
-                .param("reportType", "sales_trend")
-                .param("drillDownDimension", "tech_category")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(filters)))
+                        .with(csrf())
+                        .param("reportType", "sales_trend")
+                        .param("drillDownDimension", "tech_category")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filters)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     public void testRunManualBatch() throws Exception {
         // Phase 4: Test manual batch execution
-        mockMvc.perform(post("/api/v1/reports/admin/batch/daily"))
+        mockMvc.perform(post("/api/v1/reports/admin/batch/daily")
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value("SUCCESS"));
@@ -231,8 +242,9 @@ public class ReportControllerPhase14Test {
         // Missing reportType which is required
 
         mockMvc.perform(post("/api/v1/reports/custom-reports")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
