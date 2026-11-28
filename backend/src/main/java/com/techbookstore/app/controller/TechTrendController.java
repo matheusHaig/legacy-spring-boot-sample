@@ -17,7 +17,6 @@ import java.util.HashMap;
  */
 @RestController
 @RequestMapping("/api/tech-trends")
-@CrossOrigin(origins = "*")
 public class TechTrendController {
 
     private static final Logger logger = LoggerFactory.getLogger(TechTrendController.class);

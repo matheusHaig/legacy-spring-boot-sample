@@ -28,7 +28,6 @@ import org.springframework.validation.annotation.Validated;
  */
 @RestController
 @RequestMapping("/api/v1/reports")
-@CrossOrigin(origins = "${app.cors.allowed-origins:http://localhost:3000}")
 @Validated
 public class ReportController {
     

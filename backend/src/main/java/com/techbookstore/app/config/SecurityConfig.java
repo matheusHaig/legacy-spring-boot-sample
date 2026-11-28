@@ -17,11 +17,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.util.Assert;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableWebSecurity
+@ConditionalOnWebApplication(
+        type = ConditionalOnWebApplication.Type.SERVLET
+)
 public class SecurityConfig {
 
     @Bean
@@ -69,6 +73,7 @@ public class SecurityConfig {
     @Order(2)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 antMatcher("/swagger-ui/**"),

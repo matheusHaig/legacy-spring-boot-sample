@@ -9,6 +9,10 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.util.Assert;
+import java.util.Arrays;
 
 import java.util.Locale;
 
@@ -17,6 +21,36 @@ import java.util.Locale;
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = Arrays.stream(allowedOrigins.split(",", -1))
+                .map(String::trim)
+                .toArray(String[]::new);
+
+        for (String origin : origins) {
+            Assert.hasText(origin, "CORS origin must not be empty");
+            Assert.isTrue(!origin.contains("*"),
+                    "Wildcard CORS origins are not allowed");
+        }
+
+        registry.addMapping("/**")
+                .allowedOrigins(origins)
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD")
+                .allowedHeaders(
+                        "Authorization",
+                        "Content-Type",
+                        "Accept",
+                        "Accept-Language",
+                        "X-CSRF-TOKEN",
+                        "X-XSRF-TOKEN"
+                )
+                .allowCredentials(false)
+                .maxAge(3600);
+    }
     
     @Bean
     public LocaleResolver localeResolver() {

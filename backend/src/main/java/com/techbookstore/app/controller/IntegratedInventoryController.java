@@ -20,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
  */
 @RestController
 @RequestMapping("/api/v1/inventory/integrated")
-@CrossOrigin(origins = "http://localhost:3000")
 public class IntegratedInventoryController {
     
     private static final Logger logger = LoggerFactory.getLogger(IntegratedInventoryController.class);
